@@ -168,4 +168,32 @@ describe('Register Page', () => {
 
 		expect(window.alert).toBeCalledWith('Password and password confirmation does not match')
 	})
+
+	it('should be able to filter user list', async () => {
+		const { getByTestId, getAllByTestId } = render(
+			<MemoryRouter>
+				<Register
+					initialUsers={[
+						{
+							name: 'Diego Lincoln',
+							password: '123456',
+						},
+						{
+							name: 'Walter White',
+							password: '123456',
+						},
+					]}
+				/>
+			</MemoryRouter>
+		)
+
+		const searchUserInput = getByTestId('search-user-input')
+
+		await userEvent.type(searchUserInput, 'Walter')
+
+		const userList = getAllByTestId('user-list-item')
+
+		expect(userList).toHaveLength(1)
+		expect(userList[0]).toHaveTextContent('Walter White')
+	})
 })
