@@ -11,6 +11,7 @@ type RegisterProps = {
 
 function Register(props?: RegisterProps) {
 	const [users, setUsers] = useState<UserProps[]>(props?.initialUsers ?? [])
+	const [userFilter, setUserFilter] = useState('')
 
 	const [name, setName] = useState('')
 	const [password, setPassword] = useState('')
@@ -42,6 +43,9 @@ function Register(props?: RegisterProps) {
 		[name, password, confirmPassword]
 	)
 
+	// Clear the user filter to prevent the user from not seeing a recently created user
+	const clearUsersFilter = useCallback(() => setUserFilter(''), [])
+
 	return (
 		<>
 			<h1 data-testid='page-header-title'>Register Page</h1>
@@ -52,7 +56,10 @@ function Register(props?: RegisterProps) {
 					type='text'
 					placeholder='Nome'
 					value={name}
-					onChange={(e) => setName(e.target.value)}
+					onChange={(e) => {
+						clearUsersFilter()
+						setName(e.target.value)
+					}}
 				/>
 
 				<input
@@ -60,7 +67,10 @@ function Register(props?: RegisterProps) {
 					type='password'
 					placeholder='Senha'
 					value={password}
-					onChange={(e) => setPassword(e.target.value)}
+					onChange={(e) => {
+						clearUsersFilter()
+						setPassword(e.target.value)
+					}}
 				/>
 
 				<input
@@ -68,7 +78,10 @@ function Register(props?: RegisterProps) {
 					type='password'
 					placeholder='Confirmação de senha'
 					value={confirmPassword}
-					onChange={(e) => setConfirmPassword(e.target.value)}
+					onChange={(e) => {
+						clearUsersFilter()
+						setConfirmPassword(e.target.value)
+					}}
 				/>
 
 				<button data-testid='submit-button' type='submit'>
@@ -76,12 +89,35 @@ function Register(props?: RegisterProps) {
 				</button>
 			</form>
 
+			<input
+				data-testid='search-user-input'
+				placeholder='Buscar usuário'
+				type='text'
+				value={userFilter}
+				onChange={(e) => setUserFilter(e.target.value)}
+			/>
+
 			<ul>
-				{users.map((user) => (
-					<li data-testid='user-list-item' key={user.name}>
-						{user.name}
-					</li>
-				))}
+				{users
+					// Before render the list of users, it filters the list of users based on the query
+					.filter((user) => {
+						// If the query is empty, it returns all users
+						if (userFilter === '') {
+							return user
+						} else {
+							// If the query is not empty, it returns the users that match the query. Using include method the filter will works like "contains method"
+							const userName = user.name.toLowerCase()
+
+							const filter = userFilter.toLowerCase()
+
+							return userName.includes(filter)
+						}
+					})
+					.map((user) => (
+						<li data-testid='user-list-item' key={user.name}>
+							{user.name}
+						</li>
+					))}
 			</ul>
 		</>
 	)
