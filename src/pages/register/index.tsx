@@ -44,6 +44,8 @@ function Register(props?: RegisterProps) {
 
 	return (
 		<>
+			<h1 data-testid='page-header-title'>Register Page</h1>
+
 			<form data-testid='form-element' onSubmit={handleSubmit}>
 				<input
 					data-testid='name-input'
